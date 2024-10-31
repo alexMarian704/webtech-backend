@@ -39,7 +39,31 @@ const register = async (req, res) => {
 };
 
 const login = async (req, res) => {
-    
+    const { email, password } = req.body;
+
+    if(!email || !password) {
+        return res.status(400).json({ message: "Please provide all fields" });
+    }
+
+    try {
+        const user = await User.findOne({ where: { email } });
+
+        if(!user) {
+            return res.status(400).json({ message: "User does not exist" });
+        }
+
+        const passwordMatch = await bycrypt.compare(password, user.password);
+
+        if(!passwordMatch) {
+            return res.status(400).json({ message: "Invalid credentials" });
+        }
+
+        const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET, { expiresIn: '30d' });
+
+        return res.status(200).json({ message: "User logged in", jwt: token });
+    } catch (err) {
+        return res.status(500).json({ message: err.message });
+    }
 };
 
 export { register, login };
