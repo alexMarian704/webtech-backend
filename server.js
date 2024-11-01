@@ -3,6 +3,7 @@ import dotenv from 'dotenv';
 import cors from 'cors';
 import sequelize from './models/index.js';
 import authRoutes from './routes/authRoutes.js';
+import noteRoutes from './routes/noteRoutes.js';
 import authenticateToken from './middleware/authMiddleware.js';
 
 dotenv.config();
@@ -15,6 +16,7 @@ app.use(cors({origin: '*'}));
 app.use(express.json());
 
 app.use('/auth', authRoutes);
+app.use('/api', authenticateToken, noteRoutes);
 
 app.get("/", (req, res) => {
     res.send("Running");
